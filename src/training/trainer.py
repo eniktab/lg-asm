@@ -99,7 +99,7 @@ class Trainer:
         scaler: Optional[torch.amp.GradScaler],
         is_train: bool,
         profiler_ctx: Any = None,
-        compiled_used: bool = False,
+        use_compile: bool = False,
     ) -> Tuple[EpochMetrics, int]:
         
         if is_train and optimizer is None:
@@ -141,7 +141,7 @@ class Trainer:
             autocast_ctx = nullcontext()
 
         profiler = profiler_ctx
-        clone_hidden = bool(compiled_used and self.device.type == "cuda")
+        clone_hidden = bool(use_compile and self.device.type == "cuda")
         outer_ctx = nullcontext() if is_train else torch.inference_mode()
 
         with outer_ctx:
@@ -821,7 +821,7 @@ class Trainer:
                         scaler=scaler,
                         is_train=True,
                         profiler_ctx=prof,
-                        compiled_used=compiled_used,
+                        use_compile=compiled_used,
                     )
                     global_step += step_inc
             else:
@@ -835,7 +835,7 @@ class Trainer:
                     scaler=scaler,
                     is_train=True,
                     profiler_ctx=None,
-                    compiled_used=compiled_used,
+                    use_compile=compiled_used,
                 )
                 global_step += step_inc
 
@@ -850,7 +850,7 @@ class Trainer:
                     scaler=None,
                     is_train=False,
                     profiler_ctx=None,
-                    compiled_used=compiled_used,
+                    use_compile=compiled_used,
                 )
             else:
                 val_metrics = None
